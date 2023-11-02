@@ -1,0 +1,309 @@
+1) Display Trans Table records with following columns CustomerID, TransDate, WeekDay, TransType, Amount Where
+TransType should display “Credit” for “C” and “Debit for “D” And WeekDay is TransDate of WeekDay, e.g. Today’s
+Date is “Apr 17 2006” and Today WeekDay is “Monday”
+
+Soln))    SELECT CustomerID, TransDate, FORMAT(TransDate, 'MM/dd/yyyy') AS TransDate, 
+       CASE WHEN TransType = 'C' THEN 'Credit' WHEN TransType = 'D' THEN 'Debit' ELSE NULL END AS TransType, 
+       Amount 
+FROM Trans;
+------------------------------------------------------------------------------------
+2). Display Trans Table records with following columns CustomerID, TransDate, Credit Amount, Debit Amount, Where
+Credit Amount is Amount When TransType = ‘C’ Where Debit Amount is Amount When TransType = ‘D’ Display Null
+Value as “0.00” Display Amount with Two Decimal. Display TransDate with “MM/dd/yyyy” Format.
+
+soln:- SELECT CustomerID, FORMAT(TransDate, 'MM/dd/yyyy') AS TransDate, 
+       CASE WHEN TransType = 'C' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Credit_Amount, 
+       CASE WHEN TransType = 'D' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Debit_Amount
+FROM Trans;
+
+
+3) Same as 2, but display the records where TransDate Month belongs to “4” month And Year = 2005.
+
+soln:- SELECT CustomerID, FORMAT(TransDate, 'MM/dd/yyyy') AS TransDate, 
+       CASE WHEN TransType = 'C' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Credit_Amount, 
+       CASE WHEN TransType = 'D' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Debit_Amount
+FROM Trans
+WHERE DATEPART(YEAR, TransDate) = 2005 AND DATEPART(MONTH, TransDate) = 4;
+
+
+4) Same as 2, but display the records where TransDate is StartDate of the Month
+
+soln:- SELECT CustomerID, FORMAT(TransDate, 'MM/dd/yyyy') AS TransDate, 
+       CASE WHEN TransType = 'C' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Credit_Amount, 
+       CASE WHEN TransType = 'D' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Debit_Amount
+FROM Trans
+WHERE DATEPART(DAY, TransDate) = 1;
+
+5)Same as 2, but display the records where TransDate is EndDate of the Month
+
+soln:- SELECT CustomerID, FORMAT(TransDate, 'MM/dd/yyyy') AS TransDate, 
+       CASE WHEN TransType = 'C' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Credit_Amount, 
+       CASE WHEN TransType = 'D' THEN FORMAT(Amount, 'N2') ELSE '0.00' END AS Debit_Amount
+FROM Trans
+WHERE DATEPART(DAY, TransDate) = DATEPART(DAY, DATEADD(DAY, -1, DATEADD(MONTH, 1, TransDate)));
+
+
+6)Display Trans Table records with following columns CustomerID, Year, Credit Total Amount, Debit Total Amount I
+need Total for each CustomerID, Year Where Credit Total Amount and Debit Total Amount is Sum of Amount Null
+Amount should display as 0.00
+
+soln:-SELECT CustomerID, DATEPART(YEAR, TransDate) AS Year, 
+       SUM(CASE WHEN TransType = 'C' THEN Amount ELSE 0.00 END) AS Credit_Total_Amount, 
+       SUM(CASE WHEN TransType = 'D' THEN Amount ELSE 0.00 END) AS Debit_Total_Amount
+FROM Trans
+GROUP BY CustomerID, DATEPART(YEAR, TransDate);
+
+
+Q2)  How to pass an array using call by value in C ? Assuming array is declared locally that is inside main() ?
+
+In C, when you pass an array to a function, it is typically passed by reference, which means that you are passing a pointer to the array's memory location. This allows the function to directly modify the original array. If you want to pass an array by value, you can create a copy of the array within the function. Here's an example of how to do this:
+ #include <stdio.h>
+
+void modifyArrayByValue(int arr[], int size) {
+    int copyArr[size]; // Create a copy of the array
+
+    // Copy elements from the original array to the copy
+    for (int i = 0; i < size; i++) {
+        copyArr[i] = arr[i];
+    }
+
+    // Modify the copy of the array
+    for (int i = 0; i < size; i++) {
+        copyArr[i] *= 2;
+    }
+
+    // Print the modified copy
+    for (int i = 0; i < size; i++) {
+        printf("%d ", copyArr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int originalArray[] = {1, 2, 3, 4, 5};
+    int size = sizeof(originalArray) / sizeof(originalArray[0]);
+
+    // Call the function and pass the array by value
+    modifyArrayByValue(originalArray, size);
+
+    // Print the original array to show that it remains unchanged
+    for (int i = 0; i < size; i++) {
+        printf("%d ", originalArray[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+  
+
+
+In this program, the modifyArrayByValue function creates a local copy of the original array, modifies the copy, and then prints the modified copy. When you call this function, it does not modify the original array in the main function. This demonstrates the concept of passing an array by value in C by creating a copy of the array within the function.
+=======================================================
+Q4) Which line will show error and why?
+#include<stdio.h>
+int main(){
+char *a = "India";
+char b[] = "India";
+a = a+1;//line 5
+b = b+1;//line 6
+}
+
+ans) 
+In the given code, you are working with character arrays and pointers in C. There is an issue with line 6 that will result in a compilation error. Here's why:
+
+1. `char *a = "India";` declares a character pointer `a` and initializes it with the address of a string literal "India." In C, string literals are read-only, and you cannot modify them directly.
+
+2. `char b[] = "India";` declares a character array `b` and initializes it with the characters of the string "India." This creates a writable array that you can modify.
+
+3. `a = a+1;` is valid because it increments the pointer `a` to point to the next character in the string literal.
+
+4. `b = b+1;` is invalid because it attempts to change the base address of the array `b`, and this operation is not allowed in C. Array names are not modifiable, and you cannot reassign them to point to a different memory location. Arrays are not the same as pointers, even though they are often used interchangeably in some contexts.
+
+So, the error occurs on line 6, and you should remove that line to make the code valid.
+------------------------------------------------------------
+ques:- Write a simple web server in C (not C++) which accepts HTTP requests (eg. GET requests for HTML pages) and return
+responses (eg. HTML pages showing parameters passed with GET request).
+
+ans) #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+#define PORT 8080
+
+void handle_client(int client_socket) {
+    char response[1024];
+    char buffer[1024];
+    int bytes_read;
+
+    // Read the client's request
+    bytes_read = read(client_socket, buffer, sizeof(buffer) - 1);
+    if (bytes_read < 0) {
+        perror("Failed to read from client");
+        return;
+    }
+
+    buffer[bytes_read] = '\0';
+
+    // Parse the HTTP request (basic handling for GET requests)
+    if (strncmp(buffer, "GET", 3) == 0) {
+        // Extract the requested URL (in this example, everything after the first space)
+        char *url = strtok(buffer + 4, " ");
+        // Handle the URL, e.g., extracting parameters
+        snprintf(response, sizeof(response),
+                 "HTTP/1.1 200 OK\r\n"
+                 "Content-Type: text/html\r\n"
+                 "\r\n"
+                 "<html><body><h1>Hello, Web Server!</h1>"
+                 "<p>Requested URL: %s</p></body></html>",
+                 url);
+    } else {
+        // Unsupported HTTP method
+        snprintf(response, sizeof(response),
+                 "HTTP/1.1 400 Bad Request\r\n"
+                 "Content-Type: text/html\r\n"
+                 "\r\n"
+                 "<html><body><h1>400 Bad Request</h1></body></html>");
+    }
+
+    // Send the response to the client
+    write(client_socket, response, strlen(response));
+    close(client_socket);
+}
+
+int main() {
+    int server_socket, client_socket;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+
+    // Create a socket
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket < 0) {
+        perror("Failed to create server socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize server address structure
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(PORT);
+
+    // Bind the socket to the specified address and port
+    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Failed to bind server socket");
+        exit(EXIT_FAILURE);
+    }
+
+    // Listen for incoming connections
+    if (listen(server_socket, 5) < 0) {
+        perror("Failed to listen for connections");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Web server listening on port %d...\n", PORT);
+
+    while (1) {
+        // Accept a client connection
+        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
+        if (client_socket < 0) {
+            perror("Failed to accept client connection");
+            continue;
+        }
+
+        // Handle the client's request
+        handle_client(client_socket);
+    }
+
+    // Close the server socket (will not be reached in this example)
+    close(server_socket);
+
+    return 0;
+}
+
+
+-------------------------------------------------------------------------
+Ques:  Design and Code a simple calculator software based on Chromium Embedded Framework?
+
+Step 1: Set Up Your Development Environment
+
+Make sure you have CEF installed and set up for your development environment. You can find instructions for setting up CEF on the CEF website.
+
+Step 2: Create a New CEF Application
+
+Create a new CEF application project in your preferred C++ development environment. You'll typically need to include the CEF headers and link against the CEF libraries.
+
+Step 3: Create the User Interface
+
+Design your calculator user interface using HTML, CSS, and JavaScript. You can create a simple HTML file for the calculator interface. For example, your HTML file might look like this:
+
+html
+Copy code
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Calculator</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" value="" readonly>
+        <div class="buttons">
+            <button onclick="appendToDisplay('1')">1</button>
+            <!-- Add buttons for other numbers and operations -->
+        </div>
+    </div>
+    <script src="calculator.js"></script>
+</body>
+</html>
+Step 4: Create JavaScript Logic
+
+Create a JavaScript file (e.g., calculator.js) to handle the calculator's logic. Define functions for performing arithmetic operations and updating the display.
+
+javascript
+Copy code
+function appendToDisplay(value) {
+    document.getElementById('display').value += value;
+}
+
+// Add functions for other calculator operations (add, subtract, multiply, divide, clear, etc.)
+Step 5: Integrate CEF with Your Application
+
+In your CEF application code, you need to load and display your HTML file. Initialize CEF and set up the application window. Below is a simplified example:
+
+cpp
+Copy code
+#include <iostream>
+#include <include/cef_app.h>
+#include <include/cef_browser.h>
+#include <include/cef_command_line.h>
+#include <include/wrapper/cef_helpers.h>
+
+class CalculatorApp : public CefApp, public CefBrowserProcessHandler {
+public:
+    CalculatorApp() {}
+
+    CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override {
+        return this;
+    }
+
+    void OnContextInitialized() override {
+        CefRefPtr<CefCommandLine> command_line = CefCommandLine::GetGlobalCommandLine();
+        CefRefPtr<CefBrowser> browser = CefBrowserHost::CreateBrowserSync(...); // Create browser instance
+        CefBrowserSettings settings;
+        CefRefPtr<CefClient> client;
+        browser->GetMainFrame()->LoadURL("file:///path/to/your/html/file.html");
+    }
+};
+
+int main(int argc, char* argv[]) {
+    CefMainArgs args(argc, argv);
+    CefRefPtr<CalculatorApp> app(new CalculatorApp());
+    return CefExecuteProcess(args, app, nullptr);
+}
+This is a simplified example of how to integrate CEF with your application. You should consult the CEF documentation for more details on initialization and integration. The CefBrowserProcessHandler is used to create and configure the browser instance to display your HTML content.
+
+Step 6: Build and Run
+
+Build your application and run it. You should see a window with your calculator user interface that can perform basic calculations.
